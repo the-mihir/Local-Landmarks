@@ -1,6 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
-import { MapPin, Locate, X, Loader2, Info, ExternalLink, AlertCircle, } from "lucide-react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import {
+  MapPin,
+  Locate,
+  X,
+  Loader2,
+  Info,
+  ExternalLink,
+  AlertCircle,
+} from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,10 +25,12 @@ import type { Landmark, LandmarkDetail } from "@shared/schema";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
+
 // Fix Leaflet default icon issue with Vite
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
@@ -62,13 +78,20 @@ interface LandmarkDetailPanelProps {
 }
 
 function LandmarkDetailPanel({ pageid, onClose }: LandmarkDetailPanelProps) {
-  const { data: landmarkDetail, isLoading, error, refetch } = useQuery<LandmarkDetail>({
+  const {
+    data: landmarkDetail,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<LandmarkDetail>({
     queryKey: ["/api/landmarks/detail", pageid],
     queryFn: async () => {
       if (!pageid) throw new Error("No page ID");
       const response = await fetch(`/api/landmarks/${pageid}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch landmark details: ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch landmark details: ${response.statusText}`
+        );
       }
       return response.json();
     },
@@ -83,7 +106,10 @@ function LandmarkDetailPanel({ pageid, onClose }: LandmarkDetailPanelProps) {
     <div className="fixed inset-x-0 bottom-0 z-[1000] lg:right-0 lg:left-auto lg:top-0 lg:bottom-0 lg:w-96 transition-transform duration-200 ease-in-out">
       <Card className="h-80 lg:h-full rounded-t-2xl lg:rounded-none border-t lg:border-l shadow-2xl overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-4">
-          <CardTitle className="text-2xl font-semibold line-clamp-2" data-testid="text-landmark-title">
+          <CardTitle
+            className="text-2xl font-semibold line-clamp-2"
+            data-testid="text-landmark-title"
+          >
             {isLoading ? "Loading..." : landmarkDetail?.title || "Landmark"}
           </CardTitle>
           <Button
@@ -108,9 +134,9 @@ function LandmarkDetailPanel({ pageid, onClose }: LandmarkDetailPanelProps) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="flex items-center justify-between gap-2">
                   <span>Failed to load landmark details</span>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => refetch()}
                     data-testid="button-retry-detail"
                   >
@@ -134,7 +160,10 @@ function LandmarkDetailPanel({ pageid, onClose }: LandmarkDetailPanelProps) {
                 {landmarkDetail.extract && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium">About</h3>
-                    <p className="text-sm text-foreground leading-relaxed" data-testid="text-landmark-extract">
+                    <p
+                      className="text-sm text-foreground leading-relaxed"
+                      data-testid="text-landmark-extract"
+                    >
                       {landmarkDetail.extract}
                     </p>
                   </div>
@@ -146,7 +175,10 @@ function LandmarkDetailPanel({ pageid, onClose }: LandmarkDetailPanelProps) {
                   data-testid="button-view-wikipedia"
                 >
                   <a
-                    href={landmarkDetail.url || `https://en.wikipedia.org/?curid=${landmarkDetail.pageid}`}
+                    href={
+                      landmarkDetail.url ||
+                      `https://en.wikipedia.org/?curid=${landmarkDetail.pageid}`
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -171,7 +203,13 @@ interface LandmarkListSidebarProps {
   onRetry: () => void;
 }
 
-function LandmarkListSidebar({ landmarks, onSelectLandmark, isLoading, error, onRetry }: LandmarkListSidebarProps) {
+function LandmarkListSidebar({
+  landmarks,
+  onSelectLandmark,
+  isLoading,
+  error,
+  onRetry,
+}: LandmarkListSidebarProps) {
   return (
     <div className="hidden lg:block fixed left-0 top-0 bottom-0 w-80 z-[1000]">
       <Card className="h-full rounded-none border-r">
@@ -181,11 +219,23 @@ function LandmarkListSidebar({ landmarks, onSelectLandmark, isLoading, error, on
             Local Landmarks
           </CardTitle>
           <div className="flex ">
-            <p className="italic underline ms-6 text-tiny ">Created by - Mihir Das</p>
+            <a
+              href="https://getmihir.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="italic underline ml-6 text-xs"
+              aria-label="Created by - Mihir Das (opens in new tab)"
+            >
+              Created by - Mihir Das
+            </a>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            {isLoading ? "Loading..." : error ? "Error loading landmarks" : `${landmarks.length} landmarks visible`}
+            {isLoading
+              ? "Loading..."
+              : error
+              ? "Error loading landmarks"
+              : `${landmarks.length} landmarks visible`}
           </p>
         </CardHeader>
         <ScrollArea className="h-[calc(100%-5rem)]">
@@ -199,9 +249,9 @@ function LandmarkListSidebar({ landmarks, onSelectLandmark, isLoading, error, on
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="space-y-2">
                   <p>Failed to load landmarks</p>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={onRetry}
                     className="w-full"
                     data-testid="button-retry-landmarks"
@@ -233,8 +283,8 @@ function LandmarkListSidebar({ landmarks, onSelectLandmark, isLoading, error, on
                       </h3>
                       {landmark.dist !== undefined && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          {landmark.dist < 1000 
-                            ? `${Math.round(landmark.dist)}m away` 
+                          {landmark.dist < 1000
+                            ? `${Math.round(landmark.dist)}m away`
                             : `${(landmark.dist / 1000).toFixed(1)}km away`}
                         </p>
                       )}
@@ -253,14 +303,25 @@ function LandmarkListSidebar({ landmarks, onSelectLandmark, isLoading, error, on
 export default function MapPage() {
   const queryClient = useQueryClient();
   const [selectedPageid, setSelectedPageid] = useState<number | null>(null);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([40.7128, -74.0060]); // NYC default
+  const [mapCenter, setMapCenter] = useState<[number, number]>([
+    40.7128, -74.006,
+  ]); // NYC default
   const [mapZoom, setMapZoom] = useState(13);
-  const [searchParams, setSearchParams] = useState<{ lat: number; lon: number; radius: number } | null>(null);
+  const [searchParams, setSearchParams] = useState<{
+    lat: number;
+    lon: number;
+    radius: number;
+  } | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Query for landmarks using TanStack Query
-  const { data: landmarksData, isLoading, error, refetch } = useQuery<{ landmarks: Landmark[] }>({
+  const {
+    data: landmarksData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<{ landmarks: Landmark[] }>({
     queryKey: ["/api/landmarks/search", searchParams],
     queryFn: async () => {
       if (!searchParams) throw new Error("No search parameters");
@@ -279,25 +340,34 @@ export default function MapPage() {
 
   const landmarks = landmarksData?.landmarks || [];
 
-  const debouncedFetchLandmarks = useCallback((lat: number, lng: number, zoom: number) => {
-    // Clear existing timeout
-    if (fetchTimeoutRef.current) {
-      clearTimeout(fetchTimeoutRef.current);
-    }
+  const debouncedFetchLandmarks = useCallback(
+    (lat: number, lng: number, zoom: number) => {
+      // Clear existing timeout
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+      }
 
-    // Debounce API calls by 500ms
-    fetchTimeoutRef.current = setTimeout(() => {
-      // Calculate radius based on zoom level (larger radius for zoomed out views)
-      const radius = Math.min(10000, Math.max(1000, 50000 / Math.pow(2, zoom - 10)));
-      setSearchParams({ lat, lon: lng, radius });
-    }, 500);
-  }, []);
+      // Debounce API calls by 500ms
+      fetchTimeoutRef.current = setTimeout(() => {
+        // Calculate radius based on zoom level (larger radius for zoomed out views)
+        const radius = Math.min(
+          10000,
+          Math.max(1000, 50000 / Math.pow(2, zoom - 10))
+        );
+        setSearchParams({ lat, lon: lng, radius });
+      }, 500);
+    },
+    []
+  );
 
-  const handleMapMove = useCallback((lat: number, lng: number, zoom: number) => {
-    setMapCenter([lat, lng]);
-    setMapZoom(zoom);
-    debouncedFetchLandmarks(lat, lng, zoom);
-  }, [debouncedFetchLandmarks]);
+  const handleMapMove = useCallback(
+    (lat: number, lng: number, zoom: number) => {
+      setMapCenter([lat, lng]);
+      setMapZoom(zoom);
+      debouncedFetchLandmarks(lat, lng, zoom);
+    },
+    [debouncedFetchLandmarks]
+  );
 
   const handleLocate = useCallback(() => {
     if ("geolocation" in navigator) {
@@ -317,19 +387,30 @@ export default function MapPage() {
     }
   }, []);
 
-  const handleSelectLandmark = useCallback((landmark: Landmark) => {
-    setSelectedPageid(landmark.pageid);
-    if (mapRef.current) {
-      mapRef.current.setView([landmark.lat, landmark.lon], Math.max(mapZoom, 15), {
-        animate: true,
-      });
-    }
-  }, [mapZoom]);
+  const handleSelectLandmark = useCallback(
+    (landmark: Landmark) => {
+      setSelectedPageid(landmark.pageid);
+      if (mapRef.current) {
+        mapRef.current.setView(
+          [landmark.lat, landmark.lon],
+          Math.max(mapZoom, 15),
+          {
+            animate: true,
+          }
+        );
+      }
+    },
+    [mapZoom]
+  );
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
       {/* Map Container */}
-      <div className={`absolute inset-0 ${selectedPageid ? 'lg:right-96' : ''} ${landmarks.length > 0 ? 'lg:left-80' : ''} transition-all duration-300`}>
+      <div
+        className={`absolute inset-0 ${selectedPageid ? "lg:right-96" : ""} ${
+          landmarks.length > 0 ? "lg:left-80" : ""
+        } transition-all duration-300`}
+      >
         <MapContainer
           center={mapCenter}
           zoom={mapZoom}
@@ -341,7 +422,7 @@ export default function MapPage() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          
+
           <MapController onMapMove={handleMapMove} onLocate={handleLocate} />
 
           {landmarks.map((landmark) => (
@@ -357,8 +438,8 @@ export default function MapPage() {
                   <h3 className="font-semibold mb-1">{landmark.title}</h3>
                   {landmark.dist !== undefined && (
                     <p className="text-xs text-muted-foreground">
-                      {landmark.dist < 1000 
-                        ? `${Math.round(landmark.dist)}m away` 
+                      {landmark.dist < 1000
+                        ? `${Math.round(landmark.dist)}m away`
                         : `${(landmark.dist / 1000).toFixed(1)}km away`}
                     </p>
                   )}
@@ -385,9 +466,9 @@ export default function MapPage() {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between gap-2">
                 <span className="text-xs">Failed to load landmarks</span>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={() => refetch()}
                   data-testid="button-retry-map"
                 >
@@ -423,12 +504,10 @@ export default function MapPage() {
           <div className="flex items-center gap-2">
             <MapPin className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-semibold">Local Landmarks</h1>
-         
           </div>
           <Badge variant="outline" className="gap-2">
             <span className="text-xs">Powered by Wikipedia</span>
           </Badge>
-         
         </div>
       </div>
     </div>
